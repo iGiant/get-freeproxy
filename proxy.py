@@ -12,10 +12,9 @@ from urllib3.exceptions import ReadTimeoutError
 
 
 async def main():
-    loop = asyncio.get_event_loop()
     browser = await launch()
     addresses = ('http://spys.one/proxys/IT', 'http://spys.one/proxys/DE', 'http://spys.one/proxys/FR')
-    tasks = [loop.create_task(get_address(browser, url)) for url in addresses]
+    tasks = [asyncio.ensure_future(get_address(browser, url)) for url in addresses]
     temp_proxies = await asyncio.gather(*tasks)
     await browser.close()
     return temp_proxies
@@ -43,9 +42,7 @@ def check_proxy(addr: str, type_: str, spisok_: List[tuple]):
 
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    proxies_ = loop.run_until_complete(main())
-    proxies = [item for lst in proxies_ for item in lst]
+    proxies = [item for lst in asyncio.run(main()) for item in lst]
     spisok: List[tuple] = []
     threads = [Thread(target=check_proxy, args=(proxy[0], proxy[1], spisok)) for proxy in proxies]
     for thread in threads:
