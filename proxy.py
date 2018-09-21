@@ -11,26 +11,14 @@ from socket import timeout
 from urllib3.exceptions import ReadTimeoutError
 
 
-def main():
+async def main():
     loop = asyncio.get_event_loop()
-    browser = loop.run_until_complete(run_browser())
+    browser = await launch()
     addresses = ('http://spys.one/proxys/IT', 'http://spys.one/proxys/DE', 'http://spys.one/proxys/FR')
-    tasks = [loop.create_task(get_proxy(browser, url)) for url in addresses]
-    temp_proxies = loop.run_until_complete(asyncio.gather(*tasks))
-    loop.run_until_complete(close_browser(browser))
+    tasks = [loop.create_task(get_address(browser, url)) for url in addresses]
+    temp_proxies = await asyncio.gather(*tasks)
+    await browser.close()
     return temp_proxies
-
-
-async def run_browser():
-    return await launch()
-
-
-async def close_browser(browser):
-    return await browser.close()
-
-
-async def get_proxy(browser, url):
-    return await get_address(browser, url)
 
 
 async def get_address(browser, url):
@@ -55,7 +43,8 @@ def check_proxy(addr: str, type_: str, spisok_: List[tuple]):
 
 
 if __name__ == '__main__':
-    proxies_ = main()
+    loop = asyncio.get_event_loop()
+    proxies_ = loop.run_until_complete(main())
     proxies = [item for lst in proxies_ for item in lst]
     spisok: List[tuple] = []
     threads = [Thread(target=check_proxy, args=(proxy[0], proxy[1], spisok)) for proxy in proxies]
