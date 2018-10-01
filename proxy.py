@@ -5,7 +5,7 @@ from sys import argv
 import asyncio
 from pyppeteer import launch
 from typing import List
-from requests import get
+from requests import get, head
 from requests.exceptions import Timeout, ProxyError, ConnectionError
 from socket import timeout
 from urllib3.exceptions import ReadTimeoutError
@@ -34,8 +34,8 @@ def check_proxy(addr: str, type_: str, spisok_: List[tuple]):
     start = time()
     proxy = {'http': f'http://{addr}'} if 'http' in type_.lower() else {'http': f'socks5://{addr}'}
     try:
-        get('https://ya.ru', proxies=proxy, timeout=0.5)
-        end = round(time() - start, 4)
+        result = head('https://ya.ru', proxies=proxy, timeout=0.5)
+        end = round(time() - start, 4) if result.status_code == 200 else 999.999
         spisok_.append((addr, type_, end))
     except (timeout, Timeout, ProxyError, ReadTimeoutError, ConnectionError):
         pass
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     for thread in threads:
         thread.start()
     sleep(0.5)
-    spisok.sort(key=lambda x: x[2])
+    spisok = sorted([item for item in spisok if item[2] < 5], key=lambda x: x[2])
     print(*[f'{key[0]} ({key[1]}) – {key[2]} ms' for key in spisok], sep='\n')
     number = int(argv[1]) if len(argv) > 1 and argv[1].isdigit() else 0
     if number and number <= len(spisok):
