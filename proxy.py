@@ -5,7 +5,7 @@ from sys import argv
 import asyncio
 from pyppeteer import launch
 from typing import List
-from requests import get, head
+from requests import head
 from requests.exceptions import Timeout, ProxyError, ConnectionError
 from socket import timeout
 from urllib3.exceptions import ReadTimeoutError
