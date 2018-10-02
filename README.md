@@ -1,2 +1,2 @@
 # get-freeproxy
-Получение списка списка прокси с сайта spys.one c использованием pyppeteer
+Получение списка прокси с сайта spys.one c использованием pyppeteer
