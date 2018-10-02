@@ -13,7 +13,7 @@ from urllib3.exceptions import ReadTimeoutError
 
 async def main():
     browser = await launch()
-    addresses = tuple(f'http://spys.one/proxys/{country}' for country in ('IT', 'FR', 'DE'))
+    addresses = tuple(f'http://spys.one/proxys/{country}' for country in ('IT', 'FR', 'DE', 'PL'))
     tasks = [asyncio.ensure_future(get_address(browser, url)) for url in addresses]
     temp_proxies = await asyncio.gather(*tasks)
     await browser.close()
